@@ -9,6 +9,9 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Video;
 
+// adding the random function
+using System.Random;
+
 namespace TVLoader.Patches
 {
 
@@ -35,6 +38,7 @@ namespace TVLoader.Patches
 		{
 			if (currentVideoPlayer == null)
 			{ // Basically firstRun
+				
 				currentVideoPlayer = __instance.GetComponent<VideoPlayer>();
 				renderTexture = currentVideoPlayer.targetTexture;
 
@@ -58,7 +62,11 @@ namespace TVLoader.Patches
 			// Skip to the next video if this is not our first time turning on the TV
 			if (on && tvHasPlayedBefore)
 			{
-				currentClip = (currentClip + 1) % VideoManager.Videos.Count;
+				/////////////////////////////////////////////////////////////////
+				Random VidSelector = new Random();
+				currentClip = VidSelector.Next(0, VideoManager.Videos.Count);
+				//////////////////////////////////////////////////////////////////
+				
 				currentClipProperty.SetValue(__instance, currentClip);
 			}
 
@@ -91,11 +99,17 @@ namespace TVLoader.Patches
 			// Skip to the next video
 			TVLoaderPlugin.Log.LogInfo("TVFinishedClip");
 			int currentClip = (int)currentClipProperty.GetValue(__instance);
+
+			/////////////////////////////////////////////////////////////////////////////////
+   			// creating random variable for video selection
+			Random VidSelector = new Random();
+			
 			if (VideoManager.Videos.Count > 0)
-				currentClip = (currentClip + 1) % VideoManager.Videos.Count;
+				currentClip = VidSelector.Next(0, VideoManager.Videos.Count);
 
 			currentTimeProperty.SetValue(__instance, 0f);
 			currentClipProperty.SetValue(__instance, currentClip);
+			//////////////////////////////////////////////////////////////////////////////////
 
 			// Play it
 			PlayVideo(__instance);
